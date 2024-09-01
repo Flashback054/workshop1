@@ -1,0 +1,120 @@
+[
+{
+	"uri": "/vi/",
+	"title": "Giới thiệu",
+	"tags": [],
+	"description": "",
+	"content": "Đa luồng xử lý video song song với AWS: Chuyển định dạng, tạo thumbnail và phụ đề Tổng quan Trong bài lab này, chúng ta sẽ tìm hiểu cách để cài đặt một hệ thống xử lý video đa luồng song song với AWS. Hệ thống này sẽ bao gồm các thành phần sau:\nAmazon S3: Lưu trữ video nguồn và kết quả xử lý. Amazon SNS: Thông báo video đã được đăng đến các SQS tương ứng. Amazon SQS: Hàng đợi xử lý video song song. Amazon Elastic Transcoder: Dịch vụ chuyển định dạng video. Amazon Transcribe: Dịch vụ chuyển đổi giọng nói thành văn bản. Có thể dùng để tạo phụ đề từ video. Nội dung Giới thiệu Cài đặt Input S3 và Output S3 Thiết lập SNS và SQS Luồng chuyển đổi video Luồng tạo phụ đề video Kiểm tra kết quả Dọn dẹp tài nguyên "
+},
+{
+	"uri": "/vi/2-inputandoutputs3/2.1-input-s3/",
+	"title": "Cài đặt Input S3",
+	"tags": [],
+	"description": "",
+	"content": "Tạo Input S3 Bucket Truy cập vào console của S3 và tạo một bucket mới với tên ws1-input-s3-\u0026lt;tên tùy ý\u0026gt;.\nBỏ tùy chọn Block all public access và chấp nhận các cài đặt mặc định.\nCập nhật Policy cho Input S3 Bucket Truy cập vào Bucket vừa tạo, chọn Properties và sao chép ARN của Bucket.\nTruy cập vào tab Permissions và chọn Edit Bucket Policy.\nChọn Policy generator và điền thông tin như sau:\nSau khi điền đầy đủ thông tin, chọn Generate Policy và sao chép JSON Policy vừa được tạo.\nQuay lại tab Bucket Policy và dán JSON Policy vào ô Policy.\nPhải thêm /* vào cuối Resource để áp dụng Policy cho tất cả các Object trong Bucket.\nChọn Save để lưu Policy.\n"
+},
+{
+	"uri": "/vi/4.transcodingpipeline/4.1-elastic-transcoder/",
+	"title": "Elastic Transcoder",
+	"tags": [],
+	"description": "",
+	"content": "Trước tiên ta sẽ tạo một Elastic Transcoder Pipeline. Một Pipeline chứa các thông số cấu hình cho việc chuyển đổi video, bao gồm:\nInput Bucket: Nơi lưu trữ video nguồn. Output Bucket: Nơi lưu trữ video sau khi chuyển đổi. Thumbnails: Cấu hình tạo thumbnail cho video. Preset: Cấu hình chuyển định dạng video. Tạo pipeline Đầu tiên, truy cập vào Amazon Elastic Transcoder Console và chọn Create new pipeline.\nLần lượt điền các thông tin như trên hình.\nChọn Create Pipeline để tạo Pipeline.\nSao chép ID của Pipeline và các Preset Khi chạy hàm Lambda để chuyển đổi video, ta cần sử dụng ID của Pipeline và các Preset.\nỞ màn hình chính các Pipelines, chọn Pipeline vừa tạo và sao chép ID của Pipeline.\nTiếp theo, chọn Presets và sao chép ID của System preset: Generic 720p và System preset: Generic 480p.\n"
+},
+{
+	"uri": "/vi/1-introduce/",
+	"title": "Giới thiệu",
+	"tags": [],
+	"description": "",
+	"content": "Mục đích của bài Workshop là để tạo một luồng xử lý video song song khi người dùng upload video lên hệ thống (giống như việc người dùng upload video lên nền tảng Youtube thì sẽ trải qua các giai đoạn xử lý: chuyển định dạng, tạo phụ đề, kiểm duyệt nội dung, \u0026hellip;).\nCác dịch vụ sẽ sử dụng trong bài Workshop bao gồm:\nAmazon S3 Amazon S3 (Simple Storage Service) là dịch vụ lưu trữ đối tượng của Amazon Web Services (AWS). Trong Workshop này, Amazon S3 sẽ lưu trữ các video mà người dùng tải lên, nơi chúng sẽ được lưu giữ an toàn và sẵn sàng cho quá trình xử lý.\nAmazon SNS Amazon SNS (Simple Notification Service) là dịch vụ nhắn tin do AWS quản lý. Trong Workshop này, SNS sẽ được sử dụng để gửi thông báo mỗi khi có video mới được tải lên S3. Những thông báo này sẽ kích hoạt quy trình xử lý video, đảm bảo rằng video mới sẽ được xử lý ngay lập tức.\nAmazon SQS Amazon SQS (Simple Queue Service) là dịch vụ hàng đợi tin nhắn của AWS. SQS sẽ giúp quản lý các tác vụ xử lý video bằng cách xếp hàng các tác vụ này, đảm bảo chúng được thực hiện một cách tuần tự và đáng tin cậy, ngay cả khi có nhiều tác vụ diễn ra cùng lúc.\nViệc kết hợp SNS và SQS giúp xây dựng một hệ thống xử lý video mạnh mẽ, có khả năng mở rộng và hoạt động hiệu quả trong môi trường phân tán.\nAWS Lambda AWS Lambda là dịch vụ tính toán không cần quản lý máy chủ của AWS. Lambda sẽ chạy các đoạn mã để xử lý video mỗi khi nhận được sự kiện từ SQS, mà không cần phải quản lý hay cấu hình máy chủ thủ công.\nAmazon Transcribe Amazon Transcribe là dịch vụ chuyển giọng nói thành văn bản của AWS. Trong Workshop này, Transcribe sẽ tự động chuyển đổi âm thanh từ video thành văn bản, giúp tạo phụ đề hoặc phân tích nội dung dựa trên văn bản.\nAmazon Elastic Transcoder Amazon Elastic Transcoder là dịch vụ chuyển đổi định dạng video của AWS. Elastic Transcoder sẽ chuyển đổi video thành nhiều định dạng và độ phân giải khác nhau, tối ưu hóa video cho nhiều thiết bị và tốc độ mạng, đồng thời tạo hình thu nhỏ cho video.\n"
+},
+{
+	"uri": "/vi/3-sns-sqs/3.1-sns/",
+	"title": "Thiết lập SNS",
+	"tags": [],
+	"description": "",
+	"content": "Tạo SNS Topic Truy cập vào Amazon SNS Console và nhập tên topic video-processing-topic, chọn Next step.\nChọn loại Standard Topic, sau đó chọn Create topic.\nCấu hình Policy cho SNS Topic Mặc định, SNS Topic không cho phép bất kỳ dịch vụ nào gửi thông báo đến nó. Để cho phép S3 gửi thông báo đến SNS khi có video được upload, cần cấu hình Policy cho Topic.\nTruy cập vào phần Access Policy của Topic.\nTa sẽ thêm 1 dòng vào Statement của Policy để cho phép S3 gửi thông báo đến Topic.\n{ \u0026#34;Sid\u0026#34;: \u0026#34;S3 notification to SNS\u0026#34;, \u0026#34;Effect\u0026#34;: \u0026#34;Allow\u0026#34;, \u0026#34;Principal\u0026#34;: { \u0026#34;Service\u0026#34;: \u0026#34;s3.amazonaws.com\u0026#34; }, \u0026#34;Action\u0026#34;: \u0026#34;sns:Publish\u0026#34;, \u0026#34;Resource\u0026#34;: \u0026#34;\u0026lt;ARN of the Topic\u0026gt;\u0026#34;, \u0026#34;Condition\u0026#34;: { \u0026#34;ArnLike\u0026#34;: { \u0026#34;AWS:SourceArn\u0026#34;: \u0026#34;\u0026lt;ARN of the S3 Bucket\u0026gt;\u0026#34; } } } Thay thế \u0026lt;ARN of the Topic\u0026gt; bằng ARN của Topic vừa tạo và \u0026lt;ARN of the S3 Bucket\u0026gt; bằng ARN của Input S3.\nCấu hình S3 Notification để gửi thông báo đến SNS Truy cập vào Input S3 Bucket, chọn tab Properties và chọn Events.\nChọn Add notification và điền thông tin như sau:\nEvent name: video-uploaded Event types: All object create events Destination: SNS Topic và chọn Topic vừa tạo. "
+},
+{
+	"uri": "/vi/5.transcriptionpipeline/5.1-transcription-lambda/",
+	"title": "Transcription Lambda",
+	"tags": [],
+	"description": "",
+	"content": "Phần này, chúng ta sẽ tạo một AWS Lambda function để tạo phụ đề cho video. Lambda sẽ nhận thông báo từ Transcription SQS và gọi Transcribe API để tạo phụ đề cho video.\nCác bước gần như y hệt như khi tạo Lambda cho Transcoding, chỉ khác ở code và cấu hình IAM Roles.\nTạo Lambda Function Truy cập AWS Lambda Console và chọn Create function.\nĐiền các thông tin như sau:\nChọn Create function để tạo Lambda.\nThêm Trigger cho Lambda Ta sẽ biến Transcoding SQS thành trigger cho Lambda.\nĐầu tiên phải cấp quyền cho Lambda để nhận message từ SQS. Truy cập Lambda vừa tạo và vào tab Configuration rồi chọn vào Role của Lambda.\nỞ giao diện IAM Roles của Lambda, vào tab Permissions và chọn Attach policies.\nTìm kiếm SQS và chọn AWSLambdaSQSQueueExecutionRole. Role này cho phép Lambda nhận message từ SQS.\nChọn Add permissions để thêm policy.\nNgoài ra, cần thêm policy cho Lambda để truy cập Transcribe API. Tìm kiếm Transcribe và chọn AmazonTranscribeFullAccess. Chọn Add permissions để thêm policy.\nQuay lại tab Configuration của Lambda và chọn Add trigger.\nChọn SQS, chọn Transcription SQS đã tạo và điền thông tin như sau:\nSau đó chọn Add để thêm trigger.\nCode Lambda Function Chọn tab Code và điền code như sau:\nimport boto3 import os import json import random def parse_messages_and_transcribe(event, context): # Initialize Elastic Transcoder client transcribe = boto3.client(\u0026#39;transcribe\u0026#39;) # Get the S3 bucket and object key from the event for message_record in event[\u0026#39;Records\u0026#39;]: # Parse the body from JSON string to a dictionary body = json.loads(message_record[\u0026#39;body\u0026#39;]) # Access the SNS message part of the body sns_message = json.loads(body[\u0026#39;Message\u0026#39;]) for record in sns_message[\u0026#39;Records\u0026#39;]: s3_bucket = record[\u0026#39;s3\u0026#39;][\u0026#39;bucket\u0026#39;][\u0026#39;name\u0026#39;] s3_key = record[\u0026#39;s3\u0026#39;][\u0026#39;object\u0026#39;][\u0026#39;key\u0026#39;] s3_uri = f\u0026#34;s3://{s3_bucket}/{s3_key}\u0026#34; # Define output file paths base_filename = s3_key.rsplit(\u0026#39;.\u0026#39;, 1)[0] transcribe_job_name = f\u0026#34;transcription-{base_filename}-{random.randint(0,10000)}\u0026#34; transcribe.start_transcription_job( TranscriptionJobName=transcribe_job_name, Media={\u0026#39;MediaFileUri\u0026#39;: s3_uri}, MediaFormat=\u0026#39;mp4\u0026#39;, OutputBucketName = os.environ[\u0026#39;S3_OUTPUT\u0026#39;], OutputKey = f\u0026#34;{base_filename}/transcription/{base_filename}\u0026#34;, LanguageCode = \u0026#39;en-US\u0026#39;, Subtitles = { \u0026#39;Formats\u0026#39;: [ \u0026#39;vtt\u0026#39;,\u0026#39;srt\u0026#39; ], \u0026#39;OutputStartIndex\u0026#39;: 1 } ) print(f\u0026#34;Transcription job {transcribe_job_name} started\u0026#34;) def lambda_handler(event, context): try: parse_messages_and_transcribe(event, context) except Exception as ex: print(ex) return 1 Nhiệm vụ của code trên là nhận message từ SQS, lấy thông tin về video từ message và gọi Transcribe API để tạo phụ đề cho video. Để biết thêm về các tham số của Transcribe API, xem tài liệu ở đây.\nSau đó chọn Deploy để lưu code.\nEnvironment Variables Trong đoạn code trên, chúng ta sử dụng biến môi trường S3_OUTPUT để lưu thông tin về bucket lưu phụ đề. Để thêm biến môi trường, chọn tab Configuration và chọn Environment variables.\nChọn Edit và thêm biến môi trường S3_OUTPUT với giá trị là tên của Output Bucket.\n"
+},
+{
+	"uri": "/vi/2-inputandoutputs3/",
+	"title": "Cài đặt Input S3 và Output S3",
+	"tags": [],
+	"description": "",
+	"content": "Trong bước này, chúng ta sẽ thực hiện cài đặt Input S3 và Output S3, nơi lưu trữ video đầu vào (là video do người dùng upload) và nơi lưu trữ các tập tin đầu ra (video đã qua xử lý, phụ đề,\u0026hellip;) của hệ thống.\n"
+},
+{
+	"uri": "/vi/2-inputandoutputs3/2.2-output-s3/",
+	"title": "Cài đặt Output S3",
+	"tags": [],
+	"description": "",
+	"content": "Việc tạo Output S3 tương tự như Input S3. Dưới đây là kết quả:\n"
+},
+{
+	"uri": "/vi/3-sns-sqs/3.2-sqs/",
+	"title": "Thiết lập SQS",
+	"tags": [],
+	"description": "",
+	"content": "Phần này, chúng ta sẽ tạo 2 hàng đợi SQS để quản lý các tác vụ xử lý video:\ntranscoding-sqs: Hàng đợi nhận thông báo từ SNS và quản lý các tác vụ xử lý video. Ở bài viết này, chúng ta sẽ biến đổi video sang độ phân giải 720p và 480p và tạo thumbnail cho video. transcription-sqs: Hàng đợi nhận thông báo từ SNS và quản lý các tác vụ tạo phụ đề cho video. Tạo SQS Queue Truy cập vào Amazon SQS Console, chọn Create queue.\nĐặt tên hàng đợi là transcoding-sqs, chọn loại hàng đợi Standard Queue. Tất cả các cài đặt khác giữ nguyên mặc định và chọn Create queue.\nĐăng ký SQS với SNS Sau khi tạo hàng đợi, chúng ta cần đăng ký hàng đợi với SNS để nhận thông báo từ SNS.\nTruy cập vào hàng đợi transcoding-sqs, chọn tab SNS subscriptions và chọn Subcribe to Amazon SNS topic.\nChọn Topic video-processing-topic và chọn Save.\nLặp lại quy trình trên để tạo hàng đợi transcription-sqs và đăng ký với SNS.\n"
+},
+{
+	"uri": "/vi/4.transcodingpipeline/4.2-lambda/",
+	"title": "Transcoding Lambda",
+	"tags": [],
+	"description": "",
+	"content": "Phần này, chúng ta sẽ tạo một AWS Lambda function để xử lý video được tải lên S3. Lambda sẽ tạo một job chuyển định dạng video với Amazon Elastic Transcoder.\nTạo Lambda Function Truy cập AWS Lambda Console và chọn Create function.\nĐiền các thông tin như sau:\nChọn Create function để tạo Lambda.\nThêm Trigger cho Lambda Ta sẽ biến Transcoding SQS thành trigger cho Lambda.\nĐầu tiên phải cấp quyền cho Lambda để nhận message từ SQS. Truy cập Lambda vừa tạo và vào tab Configuration rồi chọn vào Role của Lambda.\nỞ giao diện IAM Roles của Lambda, vào tab Permissions và chọn Attach policies.\nTìm kiếm SQS và chọn AWSLambdaSQSQueueExecutionRole. Role này cho phép Lambda nhận message từ SQS.\nChọn Add permissions để thêm policy.\nNgoài ra, cần thêm policy cho Lambda để tạo job với Elastic Transcoder. Tìm kiếm ElasticTranscoder và chọn AmazonElasticTranscoder_JobsSubmitter. Chọn Add permissions để thêm policy.\nQuay lại tab Configuration của Lambda và chọn Add trigger.\nChọn SQS, chọn Transcoding SQS đã tạo và điền thông tin như sau:\nSau đó chọn Add để thêm trigger.\nCode Lambda Function Chọn tab Code và điền code như sau:\nimport boto3 import os import json def get_messages_and_create_job(event, context): # Initialize Elastic Transcoder client elastictranscoder = boto3.client(\u0026#39;elastictranscoder\u0026#39;) # Get the S3 bucket and object key from the event for message_record in event[\u0026#39;Records\u0026#39;]: # Parse the body from JSON string to a dictionary body = json.loads(message_record[\u0026#39;body\u0026#39;]) # Access the SNS message part of the body sns_message = json.loads(body[\u0026#39;Message\u0026#39;]) for record in sns_message[\u0026#39;Records\u0026#39;]: s3_bucket = record[\u0026#39;s3\u0026#39;][\u0026#39;bucket\u0026#39;][\u0026#39;name\u0026#39;] s3_key = record[\u0026#39;s3\u0026#39;][\u0026#39;object\u0026#39;][\u0026#39;key\u0026#39;] # Define output file paths base_filename = s3_key.rsplit(\u0026#39;.\u0026#39;, 1)[0] output_key_prefix = f\u0026#34;{base_filename}/video/\u0026#34; thumbnail_pattern = f\u0026#34;{base_filename}/thumbnail/{base_filename}-\u0026#34; + \u0026#34;{count}\u0026#34; # Set up the job parameters response = elastictranscoder.create_job( PipelineId=os.environ[\u0026#39;PIPELINE_ID\u0026#39;], # Use the Pipeline ID Input={ \u0026#39;Key\u0026#39;: s3_key, \u0026#39;FrameRate\u0026#39;: \u0026#39;auto\u0026#39;, \u0026#39;Resolution\u0026#39;: \u0026#39;auto\u0026#39;, \u0026#39;AspectRatio\u0026#39;: \u0026#39;auto\u0026#39;, \u0026#39;Interlaced\u0026#39;: \u0026#39;auto\u0026#39;, \u0026#39;Container\u0026#39;: \u0026#39;auto\u0026#39; }, Outputs=[ { \u0026#39;Key\u0026#39;: f\u0026#34;{output_key_prefix}{base_filename}-720p.mp4\u0026#34;, \u0026#39;PresetId\u0026#39;: os.environ[\u0026#39;PRESET_720P_ID\u0026#39;], # 720p Preset ID \u0026#39;ThumbnailPattern\u0026#39;: thumbnail_pattern # Generates a thumbnail for this output }, { \u0026#39;Key\u0026#39;: f\u0026#34;{output_key_prefix}{base_filename}-480p.mp4\u0026#34;, \u0026#39;PresetId\u0026#39;: os.environ[\u0026#39;PRESET_480P_ID\u0026#39;], # 480p Preset ID } ], ) print(f\u0026#34;Elastic Transcoder Job Created: {response[\u0026#39;Job\u0026#39;][\u0026#39;Id\u0026#39;]}\u0026#34;) def lambda_handler(event, context): try: get_messages_and_create_job(event, context) except Exception as ex: print(ex) return 1 Nhiệm vụ của code trên là lấy thông tin từ message của SQS, lấy thông tin về video sau đó tạo một job chuyển định dạng video với Elastic Transcoder. Mọi người có thể tham khảo thêm về các thông số cấu hình trong job tại CreateJob API.\nSau đó chọn Deploy để lưu code.\nThêm Environment Variables Trong code trên, ta sử dụng các biến môi trường để lưu Pipeline ID và Preset ID. Để thêm các biến môi trường này, chọn tab Configuration và chọn Environment variables, chọn Edit.\nChọn Add environment variable và thêm các biến môi trường là các ID ta đã lưu ở bước trước. Sau đó chọn Save để lưu.\n"
+},
+{
+	"uri": "/vi/3-sns-sqs/",
+	"title": "Thiết lập SNS và SQS",
+	"tags": [],
+	"description": "",
+	"content": "Trong workshop này, Amazon SNS và Amazon SQS đóng vai trò quan trọng trong việc quản lý luồng xử lý video khi người dùng tải lên hệ thống.\nAmazon SNS: Được sử dụng để gửi thông báo khi một video mới được tải lên S3. SNS sẽ phát đi thông báo đến các dịch vụ khác trong hệ thống, đảm bảo rằng mọi thành phần liên quan đều nhận được thông tin về sự kiện mới này. Điều này khởi tạo quá trình xử lý video một cách tự động và kịp thời.\nAmazon SQS: Đảm nhận việc quản lý các tin nhắn và điều phối các tác vụ xử lý video. Sau khi nhận được thông báo từ SNS, SQS sẽ đưa các tác vụ vào hàng đợi, giúp xử lý chúng theo đúng thứ tự và đảm bảo rằng không có tác vụ nào bị bỏ sót. Điều này đặc biệt hữu ích trong việc xử lý các công việc phức tạp, yêu cầu nhiều bước như chuyển đổi định dạng, tạo phụ đề,\u0026hellip;\nViệc tích hợp SNS và SQS trong workshop này giúp xây dựng một hệ thống xử lý video mạnh mẽ, có khả năng mở rộng và hoạt động hiệu quả trong môi trường phân tán.\n"
+},
+{
+	"uri": "/vi/4.transcodingpipeline/",
+	"title": "Luồng chuyển đổi video",
+	"tags": [],
+	"description": "",
+	"content": "Ở phần này, ta sẽ thiết lập một luồng chuyển đổi video đơn giản:\nKhi SQS nhận được thông báo về video mới, nó sẽ gửi thông báo đến Transcoding Lambda. Transcoding Lambda sẽ sử dụng Amazon Elastic Transcoder để chuyển đổi video sang định dạng 720p và 480p, và tạo thumbnail cho video. Kết quả sau khi xử lý sẽ được lưu trữ trên S3. "
+},
+{
+	"uri": "/vi/5.transcriptionpipeline/",
+	"title": "Luồng tạo phụ đề video",
+	"tags": [],
+	"description": "",
+	"content": "Ở phần này, ta sẽ thiết lập một luồng tạo phụ đề video đơn giản:\nKhi Transcription SQS nhận được thông báo về video mới, nó sẽ gửi thông báo đến Transcription Lambda. Transcription Lambda sẽ gọi Transcribe API để tạo phụ đề cho video. "
+},
+{
+	"uri": "/vi/6-test/",
+	"title": "Kiểm tra kết quả",
+	"tags": [],
+	"description": "",
+	"content": "Ta sẽ kiểm tra các luồng bằng cách upload 1 video lên Input S3 và xem kết quả.\nĐầu tiên upload video lên Input S3. Bạn có thể dùng video tùy thích (khuyến khích video độ ngắn dưới 1 phút, vì free tier của Elastic Transcoder chỉ cho phép xuất video 720p 10 phút mỗi tháng), hoặc dùng video mẫu:\ntestvideo\rtestvideo.mp4\r(739 ko)\rTruy cập vào Amazon S3 Console và upload video lên Input S3 Bucket.\nChọn Add files và chọn video cần upload, sau đó chọn Upload.\nTruy cập vào Output S3 Bucket để xem kết quả sau khi video được chuyển đổi.\n"
+},
+{
+	"uri": "/vi/7-cleanup/",
+	"title": "Dọn dẹp tài nguyên",
+	"tags": [],
+	"description": "",
+	"content": "Chúng ta sẽ tiến hành các bước sau để xóa các tài nguyên chúng ta đã tạo trong bài thực hành này.\nAmazon S3 Truy cập vào Amazon S3 console, vào phần Bucket.\nVới mỗi bucket, làm theo các bước sau:\nChọn bucket và chọn Empty để xóa tất cả các object trong bucket. Nhập permanently delete vào ô xác nhận và chọn Empty. Chọn Delete để xóa bucket. Nhập tên bucket vào ô xác nhận và chọn Delete bucket. Kiểm tra cả 2 bucket đã được xóa để đến bước tiếp theo.\nAmazon SNS Truy cập vào Amazon SNS console, vào phần Topics.\nChọn Delete để xóa topic video-processing-topic. Nhập delete me vào ô xác nhận và chọn Delete.\nAmazon SQS Truy cập vào Amazon SQS console, vào phần Queues.\nNếu hàng đợi còn tin nhắn, chọn hàng đợi và chọn Purge để xóa tất cả các tin nhắn trong hàng đợi.\nChọn Delete để xóa hàng đợi. Nhập confirm vào ô xác nhận và chọn Delete queue.\nAWS Lambda Truy cập vào AWS Lambda console, chọn Functions.\nChọn cả 2 Lambda function và chọn Action rồi Delete.\nNhập delete vào ô xác nhận và chọn Delete.\nElastic Transcoder Truy cập vào Amazon Elastic Transcoder console, chọn Pipelines.\nChọn pipeline và chọn Remove rồi xác nhận.\n"
+},
+{
+	"uri": "/vi/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/vi/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]
